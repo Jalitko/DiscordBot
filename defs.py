@@ -94,7 +94,6 @@ def positive(path):
 
     if  not positive.isdigit():
         positive = positive.replace('\xa0','')
-        
     return positive
 
 

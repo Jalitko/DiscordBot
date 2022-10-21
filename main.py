@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 from time import sleep
 import datetime
@@ -9,7 +9,9 @@ import logging
 from vars import *
 from defs import *
 
-bot = commands.Bot(command_prefix = "?")
+
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix = "?", intents=intents, help_command=None)
 
 
 
@@ -42,7 +44,7 @@ $$ |  $$ |$$ |      $$ |\$$$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |
 
 @bot.event
 async def on_message(ctx):
-    if bot.user.mentioned_in(ctx) and "<@!710901098860511252>" in ctx.content:    
+    if bot.user.mentioned_in(ctx) and "<@710901098860511252>" in ctx.content:    
         await ctx.channel.purge(limit = 1)
 
         data = read()
@@ -74,7 +76,6 @@ async def on_message(ctx):
         """
 
         embed=discord.Embed(description=description, color=0xFF5733)
-
         await ctx.channel.send(embed = embed)
 
     
@@ -206,17 +207,16 @@ $$ |  $$\ $$ |  $$ |  \$$$  /    $$ |  $$ |  $$ |
 
 async def covid_bot():
     await bot.wait_until_ready()
-    channel = bot.get_channel(id = covid_chnnel)
-    
-    pcr_test_path = '//*[@id="block_603780b691b98"]/div/h2/text()'
-    pcr_pos_path =  '//*[@id="block_6037862491b9a"]/div/h2/text()'
+    channel = bot.get_channel(covid_chnnel)
 
-    ag_test_path = '//*[@id="block_60378ba2c4f83"]/div/h2/text()'
-    ag_pos_path = '//*[@id="block_60378c0bc4f85"]/div/h2/text()'
+    pcr_test_path = '//*[@id="block_603780b691b98"]/div/p/strong/text()'
+    pcr_pos_path =  '//*[@id="block_603780b691b98"]/div/h2/text()'
 
-    dead_path = '//*[@id="block_60378d5bc4f89"]/div/h2/text()'
-    hospitalized_path = '//*[@id="block_60378c91c4f87"]/div/h2/text()'
-    hospitalized_total_path = '//*[@id="block_5e9f60f747a89"]/div/h3/text()'
+    ag_test_path = '//*[@id="block_6076a3ab55874"]/div/p/strong/text()'
+    ag_pos_path = '//*[@id="block_6076a3ab55874"]/div/h2/text()'
+
+    dead_path = '//*[@id="block_6037a30ebe76d"]/div/h2/text()'
+    hospitalized_total_path = '//*[@id="block_6137420049b76"]/div/h2/text()'
     
     
     while not bot.is_closed():
@@ -225,10 +225,9 @@ async def covid_bot():
             date = datetime.datetime.now().strftime('%x')
             last_date = open(last_date_txt, "r").read()
             last_num = open(last_num_txt, "r").read()
-            hospitalized_total_last = open(hospitalized_txt, "r").read()
             
 
-            if date != last_date and int(positive(pcr_test_path)) != int(last_num):
+            if date != last_date and int(positive(pcr_test_path).replace(' ', '')) != int(last_num.replace(' ', '')):
 
                 pcr_test = positive(pcr_test_path)
                 pcr_pos = positive(pcr_pos_path)
@@ -237,15 +236,11 @@ async def covid_bot():
                 ag_pos = positive(ag_pos_path)
 
                 deaths = positive(dead_path)
-                hospitalized = positive(hospitalized_path)
                 hospitalized_total = positive(hospitalized_total_path)
 
-                # if hospitalized_total >= hospitalized_total_last: plus_minus = ''
-                # else: plus_minus = ''
-                
                 x = datetime.datetime.now().strftime("%x")
-
-                text = f"PCR test: {format_int(pcr_test)}\nPCR pos.: {format_int(pcr_pos)}\nAG test: {format_int(ag_test)}\nAG pos.: {format_int(ag_pos)}\nHospitalized: {hospitalized_total}\nDeaths: {deaths}\n{x}"
+                
+                text = f"PCR test: {pcr_test}\nPCR pos.: {pcr_pos}\nAG test: {ag_test}\nAG pos.: {ag_pos}\nHospitalized: {hospitalized_total}\nDeaths: {deaths}\n{x}"
 
                 title = f'COVID-19 {emote_Pepehands}{emote_covid}'
                 write_data(last_date_txt, date)
@@ -253,12 +248,16 @@ async def covid_bot():
                 write_data(hospitalized_txt, hospitalized_total)
 
                 embed=discord.Embed(title=title, description=text, color=0xFF5733)
-
                 await channel.send(embed = embed)
 
         except Exception as e: 
-            print(e)
-            pass
+            print(
+                type(e).__name__,
+                __file__,
+                e.__traceback__.tb_lineno,
+                e
+            )
+            await asyncio.sleep(60)
         
         await asyncio.sleep(60)
 
@@ -282,7 +281,7 @@ $$ |  $$\ $$ |  $$ |   $$ |    $$ |        $$ |   $$ |  $$ |
 
 async def crypto_bot():
     await bot.wait_until_ready()
-    channel = bot.get_channel(id = crypto_channel)
+    channel = bot.get_channel(crypto_channel)
     
     while not bot.is_closed():
         try:
@@ -321,9 +320,9 @@ async def crypto_bot():
 
         except Exception as e: 
             print(e)
-            pass
+            await asyncio.sleep(10)
         
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
 
 
 
@@ -371,12 +370,6 @@ async def crypto_now(ctx, chart = "not"):
     else:
         await ctx.channel.purge(limit = 1)
         
-@bot.command()
-async def printemote(ctx):
-    context = ctx.message.content
-    symebols = ["<", ">", ":"]
-    for i in symebols: context = context.replace(i, "")
-    await ctx.send(context)
     
 
 
@@ -406,24 +399,24 @@ song_list = {}
 
 @bot.command(aliases=["p", "paly"])
 async def play(ctx, *, url = "https://youtu.be/4TLk42qPa60"):
-    #url = "https://www.youtube.com/watch?v=vkpYIvL_B5I"
-    #if url == "2": url = "MREEK FC'ED ORIGINAL UNITED WITH DT"
 
     channel = ctx.message.author.voice.channel
-    voice = get(bot.voice_clients, guild=ctx.guild)
+    voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
     
 
-    if voice and voice.is_connected():
-        await voice.move_to(channel)
-    else:
-        voice = await channel.connect()
-
+    if voice is not None:
+        if voice.channel != channel:
+            await voice.move_to(channel)
+    else: 
+        await channel.connect()
+        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
     
     if ("youtube.com" or "youtu.be") not in url:
         url = title_to_url(url)
     
     
-    files = os.listdir('C:/vs/dc/corner/songs')
+    files = os.listdir(songs_dir)
+    
 
     yt = YouTube(url)
     stream = yt.streams.get_by_itag(18)
@@ -431,15 +424,16 @@ async def play(ctx, *, url = "https://youtu.be/4TLk42qPa60"):
     title_time = f"{stream.title} {video_length}"
     better_title = delete_symbols(stream.title)
 
+    if files == []: stream.download(songs_dir)
     for file in files:
         a = file.split(".")[0]
 
         if a == better_title:
             break
         else:
-            stream.download("C:/vs/dc/corner/songs")
-
-    song_path = f"songs/{better_title}.mp4"
+            stream.download(songs_dir)
+            
+    song_path = f"{songs_dir}/{better_title}.mp4"
     source = FFmpegPCMAudio(song_path)
 
     try:
@@ -614,6 +608,11 @@ $$$$$$$$\ $$$$$$  | $$$$$$  |$$ |      \$$$$$$  |
 \________|\______/  \______/ \__|       \______/
 """
 
-bot.loop.create_task(crypto_bot())
-bot.loop.create_task(covid_bot())
-bot.run(TOKEN)
+
+async def main():
+    async with bot:
+        bot.loop.create_task(crypto_bot())
+        bot.loop.create_task(covid_bot())
+        await bot.start(TOKEN)
+
+asyncio.run(main())

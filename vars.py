@@ -8,15 +8,16 @@ json_file = "settigns.json"
 song = "test.mp3"
 default_activity = "?move Cukyna"
 timeout_activity = "with Cukyna"
-
+docker_dir = 'bot/'
 
 #COVID
-last_date_txt = "covid/last_date.txt"
-last_num_txt = "covid/last_num.txt"
-hospitalized_txt = "covid/hospitalized.txt"
+last_date_txt = docker_dir + "covid/last_date.txt"
+last_num_txt = docker_dir + "covid/last_num.txt"
+hospitalized_txt = docker_dir + "covid/hospitalized.txt"
 covid_chnnel = 890300334952546364
 
-
+#songs
+songs_dir = docker_dir + 'songs'
 
 #emotes
 emote_covid = "<:covid:893219430656532510>"
@@ -25,7 +26,7 @@ emote_cryptotitle = ["<:FeelsHangMan:854009297222762527>", "<:PepeOk:78014099183
 
 
 #crypto
-last_date_crpyto = "crypto/last_date.txt"
+last_date_crpyto = docker_dir + "crypto/last_date.txt"
 coins = {
     0: {'name': 'bitcoin',  'short': 'BTC',  "to": "EUR",  "toshort": "€", 'emote': '<:btc:893223507641655346>',  "color": 0xf2a900},
     1: {'name': 'ethereum', 'short': 'ETH',  "to": "EUR",  "toshort": "€", 'emote': '<:eth:893223522262999100>',  "color": 0xeceff0},
