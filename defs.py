@@ -169,31 +169,42 @@ def get_prices(coins_all):
 def coins_chart(index):
 
     coin = coins[index]["name"]
-    command = [
-        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', '--user-data-dir=D:\\Python\\Memory\\WebWhatsAppBot', 
-        '--headless', 
-        '--disable-gpu', 
-        '--screenshot=C:\\vs\\dc\\corner\\chart.png', 
-        '--window-size=2560,1440', 
-        '--force-device-scale-factor=3', 
-        f'https://coinmarketcap.com/sk/currencies/{coin}/'
-    ]
+    img_name = f"{docker_dir}chart.png"
 
-    subprocess.run(command)
+    args = [
+    'google-chrome',
+    '--headless',
+    f'--screenshot="/{docker_dir}{img_name}"',
+    '--window-size=2560,1440',
+    '--disable-gpu',
+    f'"https://www.coindesk.com/price/{coin}/"',
+    '--no-sandbox',
+    '--renderer',
+    '--no-service-autorun',
+    '--no-experiments',
+    '--no-default-browser-chec',
+    '--disable-dev-shm-usage',
+    '--disable-setuid-sandbox',
+    '--no-first-run',
+    '--no-zygote',
+    '--single-process',
+]
 
-    im = Image.open(r"chart.png")
-    
-    width, height = im.size
-    
-    left = 1775
-    top = 2095
-    right = left + 2773
-    bottom = top + 1230
+    command = " ".join(args)
+
+    os.system(command)
+
+    im = Image.open(img_name)
+
+    left = 638
+    top = 588
+    right = left + 825
+    bottom = top + 413
 
     area = (left, top, right, bottom)
     im1 = im.crop(area)
-    
-    im1.save("chart.png")
+
+    im1.save(img_name)
 
 
 

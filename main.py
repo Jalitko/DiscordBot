@@ -358,12 +358,13 @@ async def crypto_now(ctx, chart = "not"):
 
         if chart == "chart":
             coins_chart(index)
-            file = discord.File("chart.png")
-            embed.set_image(url="attachment://chart.png")
+            img_path = f"{docker_dir}chart.png"
+            file = discord.File(img_path)
+            embed.set_image(url=f"attachment://chart.png")
 
 
             await ctx.send(embed = embed, file=file)  
-            os.remove("chart.png")
+            os.remove(img_path)
         else: 
             await ctx.send(embed = embed)
 

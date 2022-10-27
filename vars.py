@@ -33,6 +33,7 @@ coins = {
     2: {'name': 'dogecoin', 'short': 'DOGE', "to": "EUR",  "toshort": "€", 'emote': '<:doge:893223534959161387>', "color": 0xba9f33},
     3: {'name': 'shiba-inu','short': 'SHIB', "to": "EUR",  "toshort": "€", 'emote': '<:shib:901110543165820948>', "color": 0xf3a733},
     4: {'name': 'cosmos',   'short': 'ATOM', "to": "EUR",  "toshort": "€", 'emote': '<:atom:913792592091709440>', "color": 0x2E3148},
+    5: {'name': 'solana',   'short': 'SOL',  "to": "EUR",  "toshort": "€", 'emote': '<:sol:1033529515919556648>', "color": 0x13f094},
 }
 
 crypto_channel = 893185256490942484
